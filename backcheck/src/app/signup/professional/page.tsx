@@ -5,6 +5,8 @@ import { auth, db } from "@/lib/firebase/client";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { generateUID } from "@/lib/utils/uid";
+
 
 export default function ProfessionalSignup() {
   const [email, setEmail] = useState("");
@@ -13,20 +15,30 @@ export default function ProfessionalSignup() {
 
   // Email/Password signup
   const handleSignup = async () => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  try {
+    // Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      await setDoc(doc(db, "users", user.uid), {
-        email: user.email,
-        role: "professional",
-      });
+    // Generate 12-char uppercase alphanumeric UID
+    const professionalUID = generateUID(12);
 
-      router.push("/professionals/profile");
-    } catch (error) {
-      console.error("Signup error:", error);
-    }
-  };
+    // Save user record to Firestore
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      role: "professional",
+      uid: professionalUID, // <-- custom UID
+      createdAt: new Date(),
+    });
+
+    // Redirect to professional profile
+    router.push("/professional/profile");
+  } catch (error: any) {
+    console.error("Signup error:", error.code, error.message);
+    alert("Signup failed: " + error.message);
+  }
+};
+
 
   // Google signup
   const handleGoogleSignup = async () => {
@@ -41,7 +53,7 @@ export default function ProfessionalSignup() {
         role: "professional",
       });
 
-      router.push("/professionals/profile");
+      router.push("/professional/profile");
     } catch (error) {
       console.error("Google signup error:", error);
     }

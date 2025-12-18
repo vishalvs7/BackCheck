@@ -22,7 +22,7 @@ export default function ProfessionalSignup() {
         role: "organisation",
       });
 
-      router.push("/organisation/dashboard");
+      router.push("/organisation/search");
     } catch (error) {
       console.error("Signup error:", error);
     }
@@ -41,7 +41,7 @@ export default function ProfessionalSignup() {
         role: "organisation",
       });
 
-      router.push("/organisation/dashboard");
+      router.push("/organisation/search");
     } catch (error) {
       console.error("Google signup error:", error);
     }

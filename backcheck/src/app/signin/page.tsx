@@ -20,8 +20,8 @@ export default function LoginPage() {
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const role = userDoc.exists() ? userDoc.data().role : null;
 
-      if (role === "professional") router.push("/professionals/profile");
-      else if (role === "organisation") router.push("/organisation/dashboard");
+      if (role === "professional") router.push("/professional/profile");
+      else if (role === "organisation") router.push("/organisation/search");
       else if (role === "admin") router.push("/admin/dashboard");
       else router.push("/");
     } catch (error) {
