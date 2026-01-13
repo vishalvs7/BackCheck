@@ -1,40 +1,6 @@
+/* src/app/globals.css - SIMPLE VERSION */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --primary: #6A1E55;
-  --secondary: #3B1C32;
-  --accent: #FF6B9D;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: ui-sans-serif, system-ui, sans-serif;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #111111;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #3B1C32;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6A1E55;
-}
-
-::selection {
-  background-color: #6A1E55;
-  color: white;
-}
+/* Remove all @layer directives for now */

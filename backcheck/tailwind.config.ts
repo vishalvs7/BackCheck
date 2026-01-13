@@ -1,61 +1,35 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+﻿// tailwind.config.ts - SIMPLE VERSION
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#000000',
-        foreground: '#ffffff',
         primary: {
-          DEFAULT: '#6A1E55',
-          50: '#F9F0F6',
-          100: '#F2D6E9',
-          200: '#E6ADD2',
-          300: '#D984BC',
-          400: '#CD5BA5',
-          500: '#6A1E55',
-          600: '#591948',
-          700: '#47143A',
-          800: '#360F2C',
-          900: '#240A1E',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
         },
-        secondary: {
-          DEFAULT: '#3B1C32',
-          50: '#F5F0F3',
-          100: '#E6D6E1',
-          200: '#CDADC3',
-          300: '#B484A5',
-          400: '#9B5B87',
-          500: '#3B1C32',
-          600: '#32182A',
-          700: '#291322',
-          800: '#200E1A',
-          900: '#170912',
+        gray: {
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
         },
-        accent: {
-          DEFAULT: '#FF6B9D',
-          50: '#FFF0F5',
-          100: '#FFD6E4',
-          200: '#FFADC9',
-          300: '#FF84AE',
-          400: '#FF5B93',
-          500: '#FF6B9D',
-          600: '#E6608D',
-          700: '#CC557D',
-          800: '#B34A6D',
-          900: '#99405D',
-        },
-      },
-      backgroundImage: {
-        'gradient-primary': 'linear-gradient(to right, #6A1E55, #3B1C32)',
-        'gradient-accent': 'linear-gradient(to right, #6A1E55, #FF6B9D)',
       },
     },
   },
   plugins: [],
 }
+export default config
