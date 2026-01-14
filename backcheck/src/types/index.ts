@@ -1,14 +1,16 @@
-// src/types/index.ts
-export type UserRole = 'talent' | 'employer' | 'admin';
-
-export interface BaseUser {
-  uid: string;
-  email: string;
-  role: UserRole;
-  createdAt: string;
-  updatedAt: string;
-  displayName?: string;
-  photoURL?: string;
+// src/types/index.ts - Update these interfaces
+export interface EmployerUser extends BaseUser {
+  role: 'employer';
+  companyName: string;
+  industry: string;
+  employeeCount?: string | null; // Allow null
+  phone?: string | null; // Allow null
+  subscription: {
+    plan: 'free' | 'pro' | 'enterprise';
+    searchesRemaining: number;
+    searchesUsed: number;
+    validUntil?: string;
+  };
 }
 
 export interface TalentUser extends BaseUser {
@@ -16,7 +18,7 @@ export interface TalentUser extends BaseUser {
   talentUID: string;
   fullName: string;
   profession: string;
-  phone?: string;
+  phone?: string | null; // Allow null
   verified: boolean;
   verificationStatus: {
     personalInfo: boolean;
@@ -40,19 +42,3 @@ export interface TalentUser extends BaseUser {
     year: number;
   }[];
 }
-
-export interface EmployerUser extends BaseUser {
-  role: 'employer';
-  companyName: string;
-  industry: string;
-  employeeCount?: string;
-  phone?: string;
-  subscription: {
-    plan: 'free' | 'pro' | 'enterprise';
-    searchesRemaining: number;
-    searchesUsed: number;
-    validUntil?: string;
-  };
-}
-
-export type AppUser = TalentUser | EmployerUser;

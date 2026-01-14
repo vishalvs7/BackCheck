@@ -1,7 +1,8 @@
-// src/lib/auth/AuthProvider.tsx
+// src/lib/auth/AuthProvider.tsx - FIXED VERSION
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -22,22 +23,20 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  signUpTalent: async () => {},
-  signUpEmployer: async () => {},
-  signIn: async () => {},
-  signOut: async () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   // Create talent user document
   const createTalentUser = async (
@@ -51,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ): Promise<TalentUser> => {
     const talentUID = generateUID();
     
-    return {
+    const talentData: TalentUser = {
       uid: userId,
       email,
       role: 'talent',
@@ -60,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       talentUID,
       fullName: userData.fullName,
       profession: userData.profession,
-      phone: userData.phone,
+      phone: userData.phone || null, // Use null instead of undefined
       verified: false,
       verificationStatus: {
         personalInfo: false,
@@ -71,9 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       displayName: userData.fullName,
     };
+    
+    return talentData;
   };
 
-  // Create employer user document
+  // Create employer user document - FIXED
   const createEmployerUser = async (
     userId: string,
     email: string,
@@ -84,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       phone?: string;
     }
   ): Promise<EmployerUser> => {
-    return {
+    const employerData: EmployerUser = {
       uid: userId,
       email,
       role: 'employer',
@@ -92,8 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatedAt: new Date().toISOString(),
       companyName: userData.companyName,
       industry: userData.industry,
-      employeeCount: userData.employeeCount,
-      phone: userData.phone,
+      employeeCount: userData.employeeCount || null, // FIX: Use null instead of undefined
+      phone: userData.phone || null, // FIX: Use null instead of undefined
       subscription: {
         plan: 'free',
         searchesRemaining: 3,
@@ -101,9 +102,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       displayName: userData.companyName,
     };
+    
+    return employerData;
   };
 
-  // Sign up talent
+  // Sign up talent - FIXED REDIRECT
   const signUpTalent = async (
     email: string,
     password: string,
@@ -134,15 +137,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       console.log('Talent signup successful');
       
+      // FIXED REDIRECT: Use correct path without /dashboard/
+      router.push('/talent/profile');
+      
     } catch (error: any) {
       console.error('Signup error:', error);
-      throw error;
+      
+      // User-friendly error messages
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Email already registered. Please sign in instead.');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('Password must be at least 6 characters.');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Please enter a valid email address.');
+      } else {
+        throw new Error(error.message || 'Failed to create account. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Sign up employer
+  // Sign up employer - FIXED
   const signUpEmployer = async (
     email: string,
     password: string,
@@ -157,10 +173,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
+      // FIX: Pass all userData including optional fields
       const employerData = await createEmployerUser(
         userCredential.user.uid,
         email,
-        userData
+        {
+          companyName: userData.companyName,
+          industry: userData.industry,
+          employeeCount: userData.employeeCount || undefined, // Pass undefined if empty
+          phone: userData.phone || undefined // Pass undefined if empty
+        }
       );
       
       const userRef = doc(db, 'users', userCredential.user.uid);
@@ -170,15 +192,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       console.log('Employer signup successful');
       
+      // FIXED REDIRECT: Use correct path without /dashboard/
+      router.push('/employer/search');
+      
     } catch (error: any) {
       console.error('Signup error:', error);
-      throw error;
+      
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Email already registered. Please sign in instead.');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('Password must be at least 6 characters.');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Please enter a valid email address.');
+      } else {
+        throw new Error(error.message || 'Failed to create account. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Sign in
+  // Sign in - FIXED REDIRECTS
   const signInUser = async (email: string, password: string) => {
     setLoading(true);
     try {
@@ -191,13 +225,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (userSnap.exists()) {
         const userData = userSnap.data() as AppUser;
         setUser(userData);
+        
+        // FIXED REDIRECTS: Use correct paths without /dashboard/
+        if (userData.role === 'talent') {
+          router.push('/talent/profile');
+        } else {
+          router.push('/employer/search');
+        }
       } else {
-        throw new Error('User profile not found');
+        throw new Error('User profile not found in database.');
       }
       
     } catch (error: any) {
       console.error('Sign in error:', error);
-      throw error;
+      
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        throw new Error('Invalid email or password.');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many failed attempts. Try again later.');
+      } else if (error.code === 'auth/user-disabled') {
+        throw new Error('Account disabled. Contact support.');
+      } else {
+        throw new Error(error.message || 'Failed to sign in. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -209,9 +259,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await firebaseSignOut(auth);
       setUser(null);
-    } catch (error) {
+      router.push('/');
+    } catch (error: any) {
       console.error('Sign out error:', error);
-      throw error;
+      throw new Error('Failed to sign out. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -228,9 +279,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (userSnap.exists()) {
             const userData = userSnap.data() as AppUser;
             setUser(userData);
+          } else {
+            console.warn('Firebase user exists but no Firestore document');
+            setUser(null);
           }
         } catch (error) {
-          console.error('Error fetching user:', error);
+          console.error('Error fetching user from Firestore:', error);
+          setUser(null);
         }
       } else {
         setUser(null);
@@ -241,15 +296,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const value = {
+    user,
+    loading,
+    signUpTalent,
+    signUpEmployer,
+    signIn: signInUser,
+    signOut: signOutUser,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      loading,
-      signUpTalent,
-      signUpEmployer,
-      signIn: signInUser,
-      signOut: signOutUser,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

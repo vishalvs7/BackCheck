@@ -33,7 +33,7 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    return null; // Will redirect via useEffect
+    return null;
   }
 
   return (

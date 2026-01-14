@@ -1,6 +1,137 @@
-/* src/app/globals.css - SIMPLE VERSION */
+/* src/app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Remove all @layer directives for now */
+@layer base {
+  :root {
+    --background: 0 0% 3.9%; /* Black base */
+    --foreground: 0 0% 98%;
+  }
+
+  * {
+    @apply border-gray-800;
+  }
+  
+  body {
+    @apply bg-black text-white antialiased;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Ghost Navy Blue buttons */
+  .btn-primary {
+    @apply bg-[#0F172A] text-white px-4 py-3 rounded-lg font-medium 
+           hover:bg-[#1E293B] transition-all duration-200 
+           border border-[#334155] hover:border-[#475569]
+           shadow-lg shadow-[#0F172A]/30;
+  }
+  
+  .btn-secondary {
+    @apply bg-[#1E293B] text-white px-4 py-3 rounded-lg font-medium 
+           hover:bg-[#334155] transition-all duration-200 
+           border border-[#475569];
+  }
+  
+  /* Cards with glass effect */
+  .card {
+    @apply bg-[#0A0A0F]/80 backdrop-blur-sm rounded-xl border border-[#1E293B] p-6 
+           shadow-xl shadow-black/20;
+  }
+  
+  /* Input fields */
+  .input-field {
+    @apply w-full px-4 py-3 bg-[#0A0A0F] border border-[#334155] rounded-lg 
+           text-white placeholder:text-gray-500 
+           focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent 
+           transition-all duration-200;
+  }
+  
+  /* Navigation links */
+  .nav-link {
+    @apply text-gray-400 hover:text-white transition-colors duration-200;
+  }
+  
+  /* Badges */
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-[#0F172A] text-[#60A5FA] border border-[#334155];
+  }
+  
+  .badge-success {
+    @apply bg-green-900/30 text-green-400 border border-green-800;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-[#0A0A0F];
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#334155] rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#475569];
+  }
+  
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-[#60A5FA] via-[#3B82F6] to-[#1D4ED8] bg-clip-text text-transparent;
+  }
+  
+  /* Glass effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Custom styles for your color palette */
+.bg-ghost-navy {
+  background-color: #0F172A; /* Ghost Navy Blue */
+}
+
+.bg-dark-black {
+  background-color: #0A0A0F; /* Dark Black */
+}
+
+.text-ghost-navy {
+  color: #0F172A;
+}
+
+.border-ghost-navy {
+  border-color: #0F172A;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
